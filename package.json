@@ -17,6 +17,8 @@
   },
   "homepage": "https://github.com/jasminepkim/liri-node-app#readme",
   "dependencies": {
+    "moment": "^2.18.1",
+    "node-spotify-api": "^1.0.7",
     "request": "^2.81.0",
     "spotify": "^0.3.0",
     "twitter": "^1.7.1"
