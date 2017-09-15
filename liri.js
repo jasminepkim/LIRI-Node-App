@@ -51,8 +51,9 @@ if (command === 'my-tweets') {
         if (err) {
             return console.log('Error occurred: ' + err);
         } else if (!spotifySearch) {
-            // to return data only for 'The Sign' by Ace of Base
-            console.log('The Sign'); 
+            // When the user does not input a track after the command,
+            // it will return data for "The Sign" by Ace of Base
+            console.log('The Sign');
         } else {
             // to print all 20 results
             data.tracks.items.forEach(function (info) {
@@ -68,6 +69,14 @@ if (command === 'my-tweets') {
 } else if (command === 'movie-this') {
     var movieName = input;
 
+    // When the user does not input a movie after the command,
+    // it will return data for the movie "Mr. Nobody"
+    if (!input) {
+        movieName = 'Mr Nobody';
+    } else {
+        movieName = command;
+    }
+
     request("http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=40e9cece",
         function (error, response, body) {
 
@@ -82,9 +91,6 @@ if (command === 'my-tweets') {
                 console.log('Actors: ' + JSON.parse(body).Actors);
             } else if (error) {
                 return console.log('Error occurred: ' + error);
-            } else if (!movieName) {
-                // to return data only for 'Mr. Nobody'
-                console.log('Mr. Nobody'); 
             }
         });
 
