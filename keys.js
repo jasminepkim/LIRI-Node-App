@@ -1,4 +1,3 @@
-// remember to comment this out before final submission
 // console.log('this is loaded');
 
 var twitterKeys = {
