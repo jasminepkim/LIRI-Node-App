@@ -6,9 +6,11 @@ var twitter = require('twitter'); //refer to package.json naming
 var moment = require('moment'); //for twitter api
 var spotify = require('node-spotify-api');
 var fs = require('fs');
+var command = process.argv[2];
+var input = process.argv[3];
 
 // TWITTER
-if (process.argv[2] === 'my-tweets') {
+if (command === 'my-tweets') {
     // console.log(keys);
     var client = new twitter(keys);
     var params = {
@@ -25,47 +27,76 @@ if (process.argv[2] === 'my-tweets') {
             // loop through the tweets and its length and return them
             for (var i = 0; i < tweets.length; i++) {
                 console.log(tweets[i].text);
-                // to add timestamps of tweets
-                console.log(moment(tweets[i].created_at, "ddd MMM D HH:mm:ss ZZ YYYY").format("MMMM D, YYYY; h:mm a"));
+                // to add timestamps of tweets with moment.js
+                console.log(moment(tweets[i].created_at,
+                    "ddd MMM D HH:mm:ss ZZ YYYY").format("MMMM D, YYYY; h:mm a"));
             }
         }
     });
-// SPOTIFY
-} else if (process.argv[2] === 'spotify-this-song') {
-    var spotifySearch = process.argv[3];
+
+    // SPOTIFY
+} else if (command === 'spotify-this-song') {
+    var spotifySearch = input;
+    var search;
     var spotify = new spotify({
         id: '92070267cbd14f06a6d85d5205985941',
-        secret: '2d7eea96198b40b3ae0c0b8a7c168777'
+        secret: '2d7eea96198b40b3ae0c0b8a7c168777',
     });
 
     spotify.search({
         type: 'track',
         query: '\'' + spotifySearch + '\'',
-        limit: 1,
+        limit: 20
     }, function (err, data) {
         if (err) {
-            return console.log('Error occurred: ' + err); //change to ace of base
+            return console.log('Error occurred: ' + err);
+        } else if (!spotifySearch) {
+            // to return data only for 'The Sign' by Ace of Base
+            console.log('The Sign'); 
         } else {
-            var info = data.tracks.items[0];
-            console.log('Name of Artist: ' + info.artists[0].name);
-            console.log('Name of Song: ' + info.name);
-            console.log('Name of Album: ' + info.album.name);
-            console.log('Preview song link: ' + info.preview_url);
+            // to print all 20 results
+            data.tracks.items.forEach(function (info) {
+                console.log('Artist: ' + info.artists[0].name);
+                console.log('Song: ' + info.name);
+                console.log('Album: ' + info.album.name);
+                console.log('Preview song link: ' + info.preview_url);
+            });
         }
     });
 
-// OMDB
-} else if (process.argv[2] === 'movie-this') {
-    console.log('best movie ever');
-// FS PACKAGE
-} else if (process.argv[2] === 'do-what-it-says') {
-    fs.readFile('random.txt', 'utf8', function (err, data){
+    // OMDB
+} else if (command === 'movie-this') {
+    var movieName = input;
+
+    request("http://www.omdbapi.com/?t=" + movieName + "&y=&plot=short&apikey=40e9cece",
+        function (error, response, body) {
+
+            if (!error && response.statusCode === 200) {
+                console.log('Title: ' + JSON.parse(body).Title);
+                console.log('Year: ' + JSON.parse(body).Year);
+                console.log('IMDB Rating: ' + JSON.parse(body).imdbRating);
+                console.log('Rotten Tomatoes Rating: ' + JSON.parse(body).Ratings[1].Value);
+                console.log('Country: ' + JSON.parse(body).Country);
+                console.log('Language: ' + JSON.parse(body).Language);
+                console.log('Plot: ' + JSON.parse(body).Plot);
+                console.log('Actors: ' + JSON.parse(body).Actors);
+            } else if (error) {
+                return console.log('Error occurred: ' + error);
+            } else if (!movieName) {
+                // to return data only for 'Mr. Nobody'
+                console.log('Mr. Nobody'); 
+            }
+        });
+
+    // FS PACKAGE
+} else if (command === 'do-what-it-says') {
+    fs.readFile('random.txt', 'utf8', function (err, data) {
         if (err) {
             return console.log(err);
         }
         console.log(data);
     })
-// NO ARGV[2] INPUT FROM USER
+    // NO ARGV[2] INPUT FROM USER
 } else {
     console.log('womp womp');
 }
